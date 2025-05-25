@@ -1,0 +1,95 @@
+import 'package:fartenbuch/src/data/database_repository.dart';
+import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
+import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
+
+class MockDatabaseRepository implements DatabaseRepository {
+  @override
+  List<Fahrt> getFahrten() {
+    return [
+      Fahrt(
+        start: Adresse(
+          ort: 'Berlin',
+          strasse: 'Alexanderplatz',
+          hausnummer: '1',
+          plz: '10178',
+          lat: 52.5219,
+          lng: 13.4132,
+        ),
+        ziel: Adresse(
+          ort: 'Potsdam',
+          strasse: 'Friedrich-Ebert-Str.',
+          hausnummer: '5',
+          plz: '14467',
+          lat: 52.5219,
+          lng: 13.4132,
+        ),
+        entfernung: 54,
+        datum: '14.04.2024',
+        beschreibung: 'Hochschulprojekt',
+        abfahrtUhrzeit: '08:00',
+        ankunftUhrzeit: '08:30',
+        kmStart: 12600,
+        kmEnde: 12654,
+        typ: 'Geschäftlich',
+        firma: 'Musterfirma Berlin',
+        kontakt: 'Max Mustermann',
+      ),
+      Fahrt(
+        start: Adresse(
+          ort: 'Dortmund',
+          strasse: 'Hansaplatz',
+          hausnummer: '5',
+          plz: '44145',
+          lat: 51.44857008265837,
+          lng: 7.568364794266259,
+        ),
+        ziel: Adresse(
+          ort: 'Schwerte',
+          strasse: 'Friedrich-Ebert-Str.',
+          hausnummer: '5',
+          plz: '14467',
+          lat: 51.52131014237037,
+          lng: 7.45960645455965,
+        ),
+        entfernung: 14,
+        datum: '19.04.2024',
+        beschreibung: 'Meeting',
+        abfahrtUhrzeit: '09:00',
+        ankunftUhrzeit: '10:20',
+        kmStart: 12800,
+        kmEnde: 12880,
+        typ: 'Geschäftlich',
+        firma: 'Tech Solutions GmbH',
+        kontakt: 'John Doe',
+      ),
+      Fahrt(
+        start: Adresse(
+          ort: 'Berlin',
+          strasse: 'Alexanderplatz',
+          hausnummer: '1',
+          plz: '10178',
+          lat: 52.4000,
+          lng: 13.0500,
+        ),
+        ziel: Adresse(
+          ort: 'Essen',
+          strasse: 'Musterfeld-Ebert-Str.',
+          hausnummer: '7',
+          plz: '14467',
+          lat: 52.5219,
+          lng: 13.4132,
+        ),
+        entfernung: 67,
+        datum: '14.05.2024',
+        beschreibung: 'Lerngruppe',
+        abfahrtUhrzeit: '13:15',
+        ankunftUhrzeit: '14:45',
+        kmStart: 13000,
+        kmEnde: 13067,
+        typ: 'Privat',
+        firma: 'Universität Berlin',
+        kontakt: 'Lisa Müller',
+      ),
+    ];
+  }
+}
