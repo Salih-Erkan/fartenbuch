@@ -56,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
             ScaleTransition(
               scale: _scaleAnimation,
               child: const Text(
-                'Fartenbuch',
+                'Fahrtenbuch',
                 style: TextStyle(
                   fontSize: 32,
                   color: Colors.white,
