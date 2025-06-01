@@ -4,7 +4,7 @@ import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 
 class MockDatabaseRepository implements DatabaseRepository {
   @override
-  List<Fahrt> getFahrten() {
+  Future<List<Fahrt>> getFahrten() async {
     return [
       Fahrt(
         start: Adresse(
@@ -12,16 +12,16 @@ class MockDatabaseRepository implements DatabaseRepository {
           strasse: 'Alexanderplatz',
           hausnummer: '1',
           plz: '10178',
-          lat: 52.5219,
-          lng: 13.4132,
+          lat: 52.50936830037417,
+          lng: 13.376094568311604,
         ),
         ziel: Adresse(
           ort: 'Potsdam',
           strasse: 'Friedrich-Ebert-Str.',
           hausnummer: '5',
           plz: '14467',
-          lat: 52.5219,
-          lng: 13.4132,
+          lat: 51.52935346311071,
+          lng: 7.487049997086014,
         ),
         entfernung: 54,
         datum: '14.04.2024',
