@@ -60,10 +60,10 @@ class FahrtListScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 8),
 
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(24),
                   ),
 
-                  elevation: 1,
+                  elevation: 2,
 
                   child: Padding(
                     padding: const EdgeInsets.all(16),
