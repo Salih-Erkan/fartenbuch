@@ -1,14 +1,17 @@
 import 'package:fartenbuch/src/features/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await dotenv.load(fileName: ".env");
+
+  // Supabase initialisieren mit .env Variablen
   await Supabase.initialize(
-    url: 'https://imvaofgxrxuwuzxuijvu.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltdmFvZmd4cnh1d3V6eHVpanZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3OTA0MDIsImV4cCI6MjA2NDM2NjQwMn0.ZpcXwTN_XnV1zgwdlvhNrijAwFeX5OxKMG4ljU8UCHY',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   runApp(const MainApp());
