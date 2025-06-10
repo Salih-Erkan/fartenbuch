@@ -1,6 +1,9 @@
 import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
+import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MockDatabaseRepository implements DatabaseRepository {
   @override
@@ -89,6 +92,32 @@ class MockDatabaseRepository implements DatabaseRepository {
         typ: 'Privat',
         firma: 'Universität Berlin',
         kontakt: 'Lisa Müller',
+      ),
+    ];
+  }
+
+  @override
+  Future<List<Fahranlass>> getFahranlaesse() async {
+    return [
+      Fahranlass(
+        name: 'Arbeit',
+        icon: FontAwesomeIcons.briefcase,
+        color: Colors.indigo,
+      ),
+      Fahranlass(
+        name: 'Einkauf',
+        icon: FontAwesomeIcons.cartShopping,
+        color: Colors.pink,
+      ),
+      Fahranlass(
+        name: 'Freizeit',
+        icon: FontAwesomeIcons.ticket,
+        color: Colors.cyan,
+      ),
+      Fahranlass(
+        name: 'Familie',
+        icon: FontAwesomeIcons.houseUser,
+        color: Colors.green,
       ),
     ];
   }

@@ -1,3 +1,4 @@
+import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
@@ -40,5 +41,11 @@ class SupabaseDatabaseRepository implements DatabaseRepository {
         kontakt: data['kontakt'],
       );
     }).toList();
+  }
+
+  @override
+  Future<List<Fahranlass>> getFahranlaesse() {
+    // TODO: implement getFahranlaesse
+    throw UnimplementedError();
   }
 }

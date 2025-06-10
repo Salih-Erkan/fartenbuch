@@ -1,4 +1,5 @@
 import 'package:fartenbuch/src/features/splash/splash_screen.dart';
+import 'package:fartenbuch/src/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -25,26 +26,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Fahrtenbuch',
-      theme: ThemeData(
-        primarySwatch: Colors.blue, // macht App-Leiste & Buttons blau
-        scaffoldBackgroundColor: Colors.white, // Hintergrundfarbe
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-        ),
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Colors.blue,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-          ),
-        ),
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.blue,
-        ).copyWith(secondary: Colors.blueAccent),
-      ),
+      theme: AppTheme.Theme,
       home: const SplashScreen(), // <- Splash zuerst anzeigen
     );
   }

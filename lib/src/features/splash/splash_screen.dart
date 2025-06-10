@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'package:fartenbuch/src/features/auth/presentation/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:fartenbuch/src/features/farten/presentation/fahrt_list_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => FahrtListScreen()),
+        MaterialPageRoute(builder: (_) => WelcomeScreen()),
       );
     });
   }
