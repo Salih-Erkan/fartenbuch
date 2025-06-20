@@ -2,7 +2,6 @@ import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:fartenbuch/src/features/home/presentation/fahranlass_erstellen_screen.dart';
 import 'package:fartenbuch/src/features/home/presentation/widget/fahranlass_card.dart';
 import 'package:flutter/material.dart';
-import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:fartenbuch/src/data/mock_database_repository.dart';
 
 class FahranlassScreen extends StatefulWidget {
@@ -13,7 +12,7 @@ class FahranlassScreen extends StatefulWidget {
 }
 
 class _FahranlassScreenState extends State<FahranlassScreen> {
-  final DatabaseRepository repository = MockDatabaseRepository();
+  final MockDatabaseRepository repository = MockDatabaseRepository();
   late Future<List<Fahranlass>> _futureKategorien;
   List<Fahranlass> _kategorien = [];
 
@@ -39,7 +38,9 @@ class _FahranlassScreenState extends State<FahranlassScreen> {
           final neuerAnlass = await Navigator.push<Fahranlass>(
             context,
             MaterialPageRoute(
-              builder: (context) => const FahranlassErstellenScreen(),
+              builder:
+                  (context) =>
+                       FahranlassErstellenScreen(repository: repository),
             ),
           );
 

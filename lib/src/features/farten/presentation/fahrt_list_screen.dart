@@ -1,26 +1,29 @@
-import 'package:fartenbuch/src/data/supabase_database_repository.dart';
+import 'package:fartenbuch/src/data/mock_database_repository.dart';
+//import 'package:fartenbuch/src/data/supabase_database_repository.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 import 'package:fartenbuch/src/features/farten/presentation/fahrt_detail_screen.dart';
+import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:flutter/material.dart';
 
 class FahrtListScreen extends StatelessWidget {
-  final repository = SupabaseDatabaseRepository();
-
-  FahrtListScreen({super.key});
+  //final repository = SupabaseDatabaseRepository();
+  final repository = MockDatabaseRepository(); // Use your repository here
+  final Fahranlass fahrtAnlass;
+  FahrtListScreen({super.key, required this.fahrtAnlass});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Fahrtenübersicht',
+        title: Text(
+          'Fahrten für ${fahrtAnlass.name}',
 
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
       ),
 
       body: FutureBuilder<List<Fahrt>>(
-        future: repository.getFahrten(),
+        future: repository.getFahrten(fahrtAnlass.id),
 
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

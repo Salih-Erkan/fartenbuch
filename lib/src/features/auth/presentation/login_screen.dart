@@ -2,6 +2,7 @@ import 'package:fartenbuch/src/features/auth/presentation/create_screen.dart';
 import 'package:fartenbuch/src/features/auth/presentation/forgot_passwort_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -26,10 +27,7 @@ class LoginScreen extends StatelessWidget {
                 left: 20,
                 right: 20,
                 top: 20,
-                bottom:
-                    bottomInset > 0
-                        ? bottomInset
-                        : 40, // Tastaturhöhe oder Standardabstand
+                bottom: bottomInset > 0 ? bottomInset : 40,
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
@@ -66,7 +64,7 @@ class LoginScreen extends StatelessWidget {
                           suffixIcon: IconButton(
                             icon: Icon(FontAwesomeIcons.eye, size: 16),
                             onPressed: () {
-                              // Toggle password visibility
+                              // TODO: Passwort-Sichtbarkeit toggeln
                             },
                           ),
                         ),
@@ -92,7 +90,9 @@ class LoginScreen extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // TODO: E-Mail/Passwort-Login (optional)
+                          },
                           child: const Text('Anmelden'),
                         ),
                       ),
@@ -111,16 +111,37 @@ class LoginScreen extends StatelessWidget {
                       SocialLoginButton(
                         iconPath: 'assets/icons/google.png',
                         label: 'Continue With Google',
+                        onPressed: () async {
+                          try {
+                            await Supabase.instance.client.auth.signInWithOAuth(
+                              OAuthProvider.google,
+                              redirectTo:
+                                  'com.example.fahrtenbuch://login-callback/', // anpassen
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Login fehlgeschlagen: $e'),
+                              ),
+                            );
+                          }
+                        },
                       ),
                       const SizedBox(height: 10),
                       SocialLoginButton(
                         iconPath: 'assets/icons/apple.png',
                         label: 'Continue With Apple',
+                        onPressed: () {
+                          // TODO: Apple-Login einrichten
+                        },
                       ),
                       const SizedBox(height: 10),
                       SocialLoginButton(
                         iconPath: 'assets/icons/facebook.png',
                         label: 'Continue With Facebook',
+                        onPressed: () {
+                          // TODO: Facebook-Login einrichten
+                        },
                       ),
                       const SizedBox(height: 20),
                       const Spacer(),
@@ -159,12 +180,14 @@ class LoginScreen extends StatelessWidget {
 class SocialLoginButton extends StatelessWidget {
   final String iconPath;
   final String label;
+  final VoidCallback? onPressed;
   final Color backgroundColor;
 
   const SocialLoginButton({
     super.key,
     required this.iconPath,
     required this.label,
+    this.onPressed,
     this.backgroundColor = const Color.fromARGB(255, 236, 236, 239),
   });
 
@@ -178,7 +201,7 @@ class SocialLoginButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
       ),
       child: TextButton(
-        onPressed: () {},
+        onPressed: onPressed,
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.center,

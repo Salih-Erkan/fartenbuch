@@ -1,3 +1,4 @@
+import 'package:fartenbuch/src/features/farten/presentation/fahrt_list_screen.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -24,10 +25,12 @@ class FahranlassCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          // TODO: Fahranlass auswählen/speichern
-          ScaffoldMessenger.of(
+          Navigator.push(
             context,
-          ).showSnackBar(SnackBar(content: Text('Ausgewählt: ${cat.name}')));
+            MaterialPageRoute(
+              builder: (_) => FahrtListScreen(fahrtAnlass: cat),
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(20),
         child: Column(

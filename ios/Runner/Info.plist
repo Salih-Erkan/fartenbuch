@@ -45,5 +45,21 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- ✅ Google Sign-in Section -->
+	<key>CFBundleURLTypes</key>
+	<array>
+	  <dict>
+	    <key>CFBundleTypeRole</key>
+	    <string>Editor</string>
+	    <key>CFBundleURLSchemes</key>
+	    <array>
+	      <!-- Diese ID musst du mit deiner GoogleService-Info.plist abstimmen -->
+	      <string>com.googleusercontent.apps.1079617088954-2vr8rv5d1uejk4g1vechoierb47lnp2
+ </string>
+	    </array>
+	  </dict>
+	</array>
+	<!-- 🔚 End of Google Sign-in Section -->
 </dict>
 </plist>

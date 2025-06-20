@@ -1,6 +1,7 @@
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
 
 class Fahrt {
+  final String fahrtenanlassId;
   final Adresse start;
   final Adresse ziel;
   final int entfernung;
@@ -15,6 +16,7 @@ class Fahrt {
   final String kontakt;
 
   Fahrt({
+    required this.fahrtenanlassId,
     required this.start,
     required this.ziel,
     required this.entfernung,

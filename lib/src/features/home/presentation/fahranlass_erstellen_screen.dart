@@ -1,9 +1,12 @@
+import 'package:fartenbuch/src/data/mock_database_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 
 class FahranlassErstellenScreen extends StatefulWidget {
-  const FahranlassErstellenScreen({super.key});
+  final MockDatabaseRepository repository;
+
+  const FahranlassErstellenScreen({super.key, required this.repository});
 
   @override
   State<FahranlassErstellenScreen> createState() =>
@@ -14,6 +17,12 @@ class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
   final nameController = TextEditingController();
   Color selectedColor = Colors.blue;
   IconData selectedIcon = FontAwesomeIcons.car;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
 
   final List<Color> availableColors = [
     Colors.redAccent,
@@ -26,8 +35,6 @@ class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
     Colors.lime,
     Colors.amber,
     Colors.orange,
-    Colors.brown,
-    Colors.grey,
   ];
 
   final List<IconData> iconChoices = [
@@ -37,7 +44,6 @@ class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
     FontAwesomeIcons.houseUser,
     FontAwesomeIcons.ticket,
     FontAwesomeIcons.heart,
-    FontAwesomeIcons.bus,
     FontAwesomeIcons.train,
     FontAwesomeIcons.utensils,
     FontAwesomeIcons.plane,
@@ -51,8 +57,6 @@ class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
     FontAwesomeIcons.clock,
     FontAwesomeIcons.tree,
     FontAwesomeIcons.brain,
-    FontAwesomeIcons.dog,
-    FontAwesomeIcons.cat,
     FontAwesomeIcons.gamepad,
     FontAwesomeIcons.music,
     FontAwesomeIcons.camera,
@@ -65,18 +69,20 @@ class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
     FontAwesomeIcons.peopleGroup, // NEU
     FontAwesomeIcons.hospital, // NEU
     FontAwesomeIcons.landmark, // NEU
-    FontAwesomeIcons.mountain, // NEU
   ];
 
-  void _submit() {
+  Future<void> _submit() async {
     final name = nameController.text.trim();
     if (name.isEmpty) return;
 
     final neuerAnlass = Fahranlass(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
       icon: selectedIcon,
       color: selectedColor,
     );
+
+    await widget.repository.createFahranlass(neuerAnlass);
 
     Navigator.pop(context, neuerAnlass);
   }

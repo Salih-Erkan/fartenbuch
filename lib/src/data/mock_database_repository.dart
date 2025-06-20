@@ -7,9 +7,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MockDatabaseRepository implements DatabaseRepository {
   @override
-  Future<List<Fahrt>> getFahrten() async {
+  Future<List<Fahrt>> getFahrten(String fahranlassId) async {
     return [
       Fahrt(
+        fahrtenanlassId: '1',
         start: Adresse(
           ort: 'Berlin',
           strasse: 'Alexanderplatz',
@@ -38,6 +39,7 @@ class MockDatabaseRepository implements DatabaseRepository {
         kontakt: 'Max Mustermann',
       ),
       Fahrt(
+        fahrtenanlassId: '2',
         start: Adresse(
           ort: 'Dortmund',
           strasse: 'Hansaplatz',
@@ -66,6 +68,7 @@ class MockDatabaseRepository implements DatabaseRepository {
         kontakt: 'John Doe',
       ),
       Fahrt(
+        fahrtenanlassId: '1',
         start: Adresse(
           ort: 'Berlin',
           strasse: 'Alexanderplatz',
@@ -93,32 +96,43 @@ class MockDatabaseRepository implements DatabaseRepository {
         firma: 'Universität Berlin',
         kontakt: 'Lisa Müller',
       ),
-    ];
+    ].where((fahrt) => fahrt.fahrtenanlassId == fahranlassId).toList();
+  }
+
+  final List<Fahranlass> _fahranleasse = [
+    Fahranlass(
+      id: '1',
+      name: 'Arbeit',
+      icon: FontAwesomeIcons.briefcase,
+      color: Colors.indigo,
+    ),
+    Fahranlass(
+      id: '2',
+      name: 'Einkauf',
+      icon: FontAwesomeIcons.cartShopping,
+      color: Colors.pink,
+    ),
+    Fahranlass(
+      id: '3',
+      name: 'Freizeit',
+      icon: FontAwesomeIcons.ticket,
+      color: Colors.cyan,
+    ),
+    Fahranlass(
+      id: '4',
+      name: 'Familie',
+      icon: FontAwesomeIcons.houseUser,
+      color: Colors.green,
+    ),
+  ];
+
+  Future<void> createFahranlass(Fahranlass fahranlass) async {
+    _fahranleasse.add(fahranlass);
   }
 
   @override
   Future<List<Fahranlass>> getFahranlaesse() async {
-    return [
-      Fahranlass(
-        name: 'Arbeit',
-        icon: FontAwesomeIcons.briefcase,
-        color: Colors.indigo,
-      ),
-      Fahranlass(
-        name: 'Einkauf',
-        icon: FontAwesomeIcons.cartShopping,
-        color: Colors.pink,
-      ),
-      Fahranlass(
-        name: 'Freizeit',
-        icon: FontAwesomeIcons.ticket,
-        color: Colors.cyan,
-      ),
-      Fahranlass(
-        name: 'Familie',
-        icon: FontAwesomeIcons.houseUser,
-        color: Colors.green,
-      ),
-    ];
+    // TODO: implement getFahranlaesse
+    return _fahranleasse;
   }
 }
