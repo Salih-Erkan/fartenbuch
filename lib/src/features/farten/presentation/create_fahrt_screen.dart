@@ -26,19 +26,22 @@ class CreateFahrtScreen extends StatefulWidget {
 }
 
 class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
+  String startort = '';
+  String startstrasse = '';
+  String starthausnummer = '';
+  String startplz = '';
+
+  String zielort = '';
+  String zielstrasse = '';
+  String zielhausnummer = '';
+  String zielplz = '';
+
   final _formKey = GlobalKey<FormState>();
 
   final _startAdressController = TextEditingController();
   final _zielAdressController = TextEditingController();
   final _beschreibungController = TextEditingController();
-  final _startOrtController = TextEditingController();
-  final _startStrasseController = TextEditingController();
-  final _startHausnummerController = TextEditingController();
-  final _startPlzController = TextEditingController();
-  final _zielOrtController = TextEditingController();
-  final _zielStrasseController = TextEditingController();
-  final _zielHausnummerController = TextEditingController();
-  final _zielPlzController = TextEditingController();
+
   final _kmStartController = TextEditingController();
   final _kmEndeController = TextEditingController();
   final _typController = TextEditingController();
@@ -78,14 +81,6 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
     _startAdressController.dispose();
     _zielAdressController.dispose();
     _beschreibungController.dispose();
-    _startOrtController.dispose();
-    _startStrasseController.dispose();
-    _startHausnummerController.dispose();
-    _startPlzController.dispose();
-    _zielOrtController.dispose();
-    _zielStrasseController.dispose();
-    _zielHausnummerController.dispose();
-    _zielPlzController.dispose();
     _kmStartController.dispose();
     _kmEndeController.dispose();
     _typController.dispose();
@@ -119,16 +114,18 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
 
   Future<void> _maybeCalculateRoute() async {
     if (_startLatLng != null && _zielLatLng != null) {
-      final route = await _directionsService.getRouteCoordinates(
+      final result = await _directionsService.getRouteWithDistance(
         origin: _startLatLng!,
         destination: _zielLatLng!,
       );
+
+      _entfernung = result.distanceInKm.toString();
 
       setState(() {
         _polylines = {
           Polyline(
             polylineId: const PolylineId('route'),
-            points: route,
+            points: result.route,
             color: Colors.blue,
             width: 5,
           ),
@@ -179,6 +176,30 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
     final lng = location['lng'];
     final position = LatLng(lat, lng);
 
+    final addressComponents = result['address_components'];
+
+    String getComponent(String type) {
+      for (var c in addressComponents) {
+        final types = c['types'];
+        if (types is List && types.contains(type)) {
+          return c['long_name'] ?? '';
+        }
+      }
+      return '';
+    }
+
+    if (isStart) {
+      startort = getComponent('locality');
+      startstrasse = getComponent('route');
+      starthausnummer = getComponent('street_number');
+      startplz = getComponent('postal_code');
+    } else {
+      zielort = getComponent('locality');
+      zielstrasse = getComponent('route');
+      zielhausnummer = getComponent('street_number');
+      zielplz = getComponent('postal_code');
+    }
+
     setState(() {
       if (isStart) {
         _startAdressController.text = description;
@@ -209,18 +230,18 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
         firma: _firmaController.text,
         kontakt: _kontaktController.text,
         start: Adresse(
-          ort: _startOrtController.text,
-          strasse: _startStrasseController.text,
-          hausnummer: _startHausnummerController.text,
-          plz: _startPlzController.text,
+          ort: startort,
+          strasse: startstrasse,
+          hausnummer: starthausnummer,
+          plz: startplz,
           lat: _startLatLng?.latitude ?? 0,
           lng: _startLatLng?.longitude ?? 0,
         ),
         ziel: Adresse(
-          ort: _zielOrtController.text,
-          strasse: _zielStrasseController.text,
-          hausnummer: _zielHausnummerController.text,
-          plz: _zielPlzController.text,
+          ort: zielort,
+          strasse: zielstrasse,
+          hausnummer: zielhausnummer,
+          plz: zielplz,
           lat: _zielLatLng?.latitude ?? 0,
           lng: _zielLatLng?.longitude ?? 0,
         ),
@@ -342,12 +363,14 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
                       controller: _kontaktController,
                       decoration: const InputDecoration(labelText: 'Kontakt'),
                     ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _saveFahrt,
-                        child: const Text('Speichern'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 30),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _saveFahrt,
+                          child: const Text('Speichern'),
+                        ),
                       ),
                     ),
                   ],

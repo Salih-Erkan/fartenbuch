@@ -24,7 +24,7 @@ class _FahrtDetailScreenState extends State<FahrtDetailScreen> {
 
   Future<void> _loadRoute() async {
     final directionsService = DirectionsService();
-    final routePoints = await directionsService.getRouteCoordinates(
+    final result = await directionsService.getRouteWithDistance(
       origin: LatLng(widget.fahrt.start.lat, widget.fahrt.start.lng),
       destination: LatLng(widget.fahrt.ziel.lat, widget.fahrt.ziel.lng),
     );
@@ -33,7 +33,7 @@ class _FahrtDetailScreenState extends State<FahrtDetailScreen> {
       _polylines.add(
         Polyline(
           polylineId: const PolylineId("route"),
-          points: routePoints,
+          points: result.route,
           color: Colors.blue,
           width: 4,
         ),
@@ -41,8 +41,8 @@ class _FahrtDetailScreenState extends State<FahrtDetailScreen> {
     });
 
     // Kamera anpassen
-    if (_mapController != null && routePoints.isNotEmpty) {
-      final bounds = _calculateBounds(routePoints);
+    if (_mapController != null && result.route.isNotEmpty) {
+      final bounds = _calculateBounds(result.route);
       await _mapController!.animateCamera(
         CameraUpdate.newLatLngBounds(bounds, 50),
       );
