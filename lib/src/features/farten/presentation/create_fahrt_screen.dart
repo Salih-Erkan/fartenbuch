@@ -1,3 +1,4 @@
+import 'package:fartenbuch/src/core/services/directions_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
@@ -48,6 +49,8 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   List<String> _startSuggestions = [];
   List<String> _zielSuggestions = [];
 
+  final DirectionsService _directionsService = DirectionsService();
+
   @override
   initState() {
     super.initState();
@@ -55,9 +58,8 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
     _datum =
         "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
     _abfahrt =
-        "${DateTime(now.year, now.month, now.day, 8, 0).hour.toString().padLeft(2, '0')}:${DateTime(now.year, now.month, now.day, 8, 0).minute.toString().padLeft(2, '0')}";
-    _ankunft =
-        "${DateTime(now.year, now.month, now.day, 8, 0).hour.toString().padLeft(2, '0')}:${DateTime(now.year, now.month, now.day, 8, 0).minute.toString().padLeft(2, '0')}";
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    _ankunft = _abfahrt;
   }
 
   String _datum = '';
@@ -66,6 +68,11 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   String _ankunft = '';
 
   Timer? _debounce;
+  GoogleMapController? _mapController;
+  Set<Polyline> _polylines = {};
+
+  LatLng _startLatLng = const LatLng(52.5200, 13.4050);
+  LatLng _zielLatLng = const LatLng(52.5200, 13.4050);
 
   @override
   void dispose() {
@@ -139,9 +146,47 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
         _zielLatLng = position;
         _zielSuggestions.clear();
       }
-
-      _mapController?.animateCamera(CameraUpdate.newLatLng(position));
     });
+
+    final route = await _directionsService.getRouteCoordinates(
+      origin: _startLatLng,
+      destination: _zielLatLng,
+    );
+
+    setState(() {
+      _polylines = {
+        Polyline(
+          polylineId: const PolylineId('route'),
+          points: route,
+          color: Colors.blue,
+          width: 5,
+        ),
+      };
+    });
+
+    _mapController?.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(
+            _startLatLng.latitude < _zielLatLng.latitude
+                ? _startLatLng.latitude
+                : _zielLatLng.latitude,
+            _startLatLng.longitude < _zielLatLng.longitude
+                ? _startLatLng.longitude
+                : _zielLatLng.longitude,
+          ),
+          northeast: LatLng(
+            _startLatLng.latitude > _zielLatLng.latitude
+                ? _startLatLng.latitude
+                : _zielLatLng.latitude,
+            _startLatLng.longitude > _zielLatLng.longitude
+                ? _startLatLng.longitude
+                : _zielLatLng.longitude,
+          ),
+        ),
+        60,
+      ),
+    );
   }
 
   void _saveFahrt() async {
@@ -153,7 +198,6 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
         entfernung: int.tryParse(_entfernung) ?? 0,
         abfahrtUhrzeit: _abfahrt,
         ankunftUhrzeit: _ankunft,
-
         kmStart: int.tryParse(_kmStartController.text) ?? 0,
         kmEnde: int.tryParse(_kmEndeController.text) ?? 0,
         typ: _typController.text,
@@ -164,26 +208,22 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
           strasse: _startStrasseController.text,
           hausnummer: _startHausnummerController.text,
           plz: _startPlzController.text,
-          lat: 0,
-          lng: 0,
+          lat: _startLatLng.latitude,
+          lng: _startLatLng.longitude,
         ),
         ziel: Adresse(
           ort: _zielOrtController.text,
           strasse: _zielStrasseController.text,
           hausnummer: _zielHausnummerController.text,
           plz: _zielPlzController.text,
-          lat: 0,
-          lng: 0,
+          lat: _zielLatLng.latitude,
+          lng: _zielLatLng.longitude,
         ),
       );
+      // await widget.repository.createFahrt(fahrt);
+      if (context.mounted) Navigator.pop(context, true);
     }
   }
-
-  GoogleMapController? _mapController;
-  Set<Polyline> _polylines = {};
-
-  LatLng _startLatLng = const LatLng(52.5200, 13.4050);
-  LatLng _zielLatLng = const LatLng(52.5200, 13.4050);
 
   @override
   Widget build(BuildContext context) {
