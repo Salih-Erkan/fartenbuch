@@ -1,6 +1,7 @@
 import 'package:fartenbuch/src/data/mock_database_repository.dart';
 //import 'package:fartenbuch/src/data/supabase_database_repository.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
+import 'package:fartenbuch/src/features/farten/presentation/create_fahrt_screen.dart';
 import 'package:fartenbuch/src/features/farten/presentation/fahrt_detail_screen.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:flutter/material.dart';
@@ -240,7 +241,16 @@ class FahrtListScreen extends StatelessWidget {
 
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Neue Fahrt hinzufügen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (_) => CreateFahrtScreen(
+                    fahrtenanlassId: fahrtAnlass.id,
+                    repository: repository,
+                  ),
+            ),
+          );
         },
 
         child: const Icon(Icons.add),
