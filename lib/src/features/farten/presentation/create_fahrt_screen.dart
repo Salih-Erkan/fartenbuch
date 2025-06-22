@@ -39,7 +39,6 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   final _zielStrasseController = TextEditingController();
   final _zielHausnummerController = TextEditingController();
   final _zielPlzController = TextEditingController();
-
   final _kmStartController = TextEditingController();
   final _kmEndeController = TextEditingController();
   final _typController = TextEditingController();
@@ -52,7 +51,7 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   final DirectionsService _directionsService = DirectionsService();
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     DateTime now = DateTime.now();
     _datum =
@@ -71,8 +70,8 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   GoogleMapController? _mapController;
   Set<Polyline> _polylines = {};
 
-  LatLng _startLatLng = const LatLng(52.5200, 13.4050);
-  LatLng _zielLatLng = const LatLng(52.5200, 13.4050);
+  LatLng? _startLatLng;
+  LatLng? _zielLatLng;
 
   @override
   void dispose() {
@@ -118,6 +117,50 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
     });
   }
 
+  Future<void> _maybeCalculateRoute() async {
+    if (_startLatLng != null && _zielLatLng != null) {
+      final route = await _directionsService.getRouteCoordinates(
+        origin: _startLatLng!,
+        destination: _zielLatLng!,
+      );
+
+      setState(() {
+        _polylines = {
+          Polyline(
+            polylineId: const PolylineId('route'),
+            points: route,
+            color: Colors.blue,
+            width: 5,
+          ),
+        };
+      });
+
+      _mapController?.animateCamera(
+        CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(
+              _startLatLng!.latitude < _zielLatLng!.latitude
+                  ? _startLatLng!.latitude
+                  : _zielLatLng!.latitude,
+              _startLatLng!.longitude < _zielLatLng!.longitude
+                  ? _startLatLng!.longitude
+                  : _zielLatLng!.longitude,
+            ),
+            northeast: LatLng(
+              _startLatLng!.latitude > _zielLatLng!.latitude
+                  ? _startLatLng!.latitude
+                  : _zielLatLng!.latitude,
+              _startLatLng!.longitude > _zielLatLng!.longitude
+                  ? _startLatLng!.longitude
+                  : _zielLatLng!.longitude,
+            ),
+          ),
+          60,
+        ),
+      );
+    }
+  }
+
   Future<void> _setSelectedPlace(String description, bool isStart) async {
     final url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$description&key=$googleApiKey&language=de&components=country:de';
@@ -148,45 +191,7 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
       }
     });
 
-    final route = await _directionsService.getRouteCoordinates(
-      origin: _startLatLng,
-      destination: _zielLatLng,
-    );
-
-    setState(() {
-      _polylines = {
-        Polyline(
-          polylineId: const PolylineId('route'),
-          points: route,
-          color: Colors.blue,
-          width: 5,
-        ),
-      };
-    });
-
-    _mapController?.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: LatLng(
-            _startLatLng.latitude < _zielLatLng.latitude
-                ? _startLatLng.latitude
-                : _zielLatLng.latitude,
-            _startLatLng.longitude < _zielLatLng.longitude
-                ? _startLatLng.longitude
-                : _zielLatLng.longitude,
-          ),
-          northeast: LatLng(
-            _startLatLng.latitude > _zielLatLng.latitude
-                ? _startLatLng.latitude
-                : _zielLatLng.latitude,
-            _startLatLng.longitude > _zielLatLng.longitude
-                ? _startLatLng.longitude
-                : _zielLatLng.longitude,
-          ),
-        ),
-        60,
-      ),
-    );
+    _maybeCalculateRoute();
   }
 
   void _saveFahrt() async {
@@ -208,21 +213,28 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
           strasse: _startStrasseController.text,
           hausnummer: _startHausnummerController.text,
           plz: _startPlzController.text,
-          lat: _startLatLng.latitude,
-          lng: _startLatLng.longitude,
+          lat: _startLatLng?.latitude ?? 0,
+          lng: _startLatLng?.longitude ?? 0,
         ),
         ziel: Adresse(
           ort: _zielOrtController.text,
           strasse: _zielStrasseController.text,
           hausnummer: _zielHausnummerController.text,
           plz: _zielPlzController.text,
-          lat: _zielLatLng.latitude,
-          lng: _zielLatLng.longitude,
+          lat: _zielLatLng?.latitude ?? 0,
+          lng: _zielLatLng?.longitude ?? 0,
         ),
       );
-      // await widget.repository.createFahrt(fahrt);
-      if (context.mounted) Navigator.pop(context, true);
+      widget.repository.saveFahrt(fahrt);
+      if (context.mounted) Navigator.pop(context, fahrt);
     }
+  }
+
+  String? _required(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Pflichtfeld';
+    }
+    return null;
   }
 
   @override
@@ -241,24 +253,24 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
               child: SizedBox(
                 height: 250,
                 child: GoogleMap(
+                  onMapCreated: (controller) => _mapController = controller,
                   initialCameraPosition: CameraPosition(
-                    target: _startLatLng,
+                    target: _startLatLng ?? const LatLng(52.52, 13.4050),
                     zoom: 12,
                   ),
-                  onMapCreated: (controller) {
-                    _mapController = controller;
-                  },
                   markers: {
-                    Marker(
-                      markerId: const MarkerId("start"),
-                      position: _startLatLng,
-                      infoWindow: const InfoWindow(title: "Start"),
-                    ),
-                    Marker(
-                      markerId: const MarkerId("ziel"),
-                      position: _zielLatLng,
-                      infoWindow: const InfoWindow(title: "Ziel"),
-                    ),
+                    if (_startLatLng != null)
+                      Marker(
+                        markerId: const MarkerId("start"),
+                        position: _startLatLng!,
+                        infoWindow: const InfoWindow(title: "Start"),
+                      ),
+                    if (_zielLatLng != null)
+                      Marker(
+                        markerId: const MarkerId("ziel"),
+                        position: _zielLatLng!,
+                        infoWindow: const InfoWindow(title: "Ziel"),
+                      ),
                   },
                   polylines: _polylines,
                   myLocationEnabled: true,
@@ -346,12 +358,5 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
         ),
       ),
     );
-  }
-
-  String? _required(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Pflichtfeld';
-    }
-    return null;
   }
 }
