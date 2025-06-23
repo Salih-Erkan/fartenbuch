@@ -17,17 +17,28 @@ dependencies:
   lottie: ^3.3.1
   supabase_flutter: ^2.9.0
   google_places_flutter: ^2.0.5
+  icons_launcher: ^3.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
 
+icons_launcher:
+  image_path: "assets/icons/app_icon.png"
+  platforms:
+    android:
+      enable: true
+      adaptive_background_color: "#2196F3"
+      adaptive_foreground_image: "assets/icons/icon_foreground.png"
+    ios:
+      enable: true
+      image_path: "assets/icons/app_icon.png"
+
 flutter:
   uses-material-design: true
   assets:
-  - assets/animation.json
-  - assets/images/
-  - assets/icons/
-  - .env
-  
+    - assets/animation.json
+    - assets/images/
+    - assets/icons/
+    - .env

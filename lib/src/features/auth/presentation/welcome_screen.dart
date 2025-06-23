@@ -66,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.black87),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
 
               SizedBox(
                 width: double.infinity,
@@ -133,22 +133,24 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-
-              TextButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) {
-                      return const GuestInfoSheet();
-                    },
-                  );
-                },
-                child: const Text(
-                  'Als Gast fortfahren?',
-                  style: TextStyle(fontSize: 14, color: Colors.black87),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 32),
+                child: TextButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) {
+                        return const GuestInfoSheet();
+                      },
+                    );
+                  },
+                  child: const Text(
+                    'Als Gast fortfahren?',
+                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
                 ),
               ),
             ],

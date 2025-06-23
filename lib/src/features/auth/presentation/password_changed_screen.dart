@@ -1,3 +1,4 @@
+import 'package:fartenbuch/src/core/presentation/app_scaffold.dart';
 import 'package:fartenbuch/src/features/home/presentation/fahr_anlass_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -6,12 +7,12 @@ class PasswordChangedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         leading: const BackButton(),
         title: const Text('Passwort geändert'),
       ),
-      body: Padding(
+      child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
         child: Column(
           children: [

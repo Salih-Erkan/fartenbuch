@@ -1,3 +1,4 @@
+import 'package:fartenbuch/src/core/presentation/app_scaffold.dart';
 import 'package:fartenbuch/src/features/auth/presentation/create_screen.dart';
 import 'package:fartenbuch/src/features/auth/presentation/forgot_passwort_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         title: const Text(
           'Login-Konto',
@@ -19,7 +20,7 @@ class LoginScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: SafeArea(
+      child: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
@@ -127,43 +128,29 @@ class LoginScreen extends StatelessWidget {
                           }
                         },
                       ),
-                      const SizedBox(height: 10),
-                      SocialLoginButton(
-                        iconPath: 'assets/icons/apple.png',
-                        label: 'Continue With Apple',
-                        onPressed: () {
-                          // TODO: Apple-Login einrichten
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      SocialLoginButton(
-                        iconPath: 'assets/icons/facebook.png',
-                        label: 'Continue With Facebook',
-                        onPressed: () {
-                          // TODO: Facebook-Login einrichten
-                        },
-                      ),
-                      const SizedBox(height: 20),
                       const Spacer(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Du hast noch kein Konto? "),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CreateAccountScreen(),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              "Registrieren",
-                              style: TextStyle(color: Colors.blue),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 32),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Du hast noch kein Konto? "),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CreateAccountScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Registrieren",
+                                style: TextStyle(color: Colors.blue),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),

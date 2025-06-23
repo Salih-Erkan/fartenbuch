@@ -27,7 +27,7 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Fahrtenbuch',
       theme: AppTheme.Theme,
-      home: const SplashScreen(), // <- Splash zuerst anzeigen
+      home: const SplashScreen(),
     );
   }
 }

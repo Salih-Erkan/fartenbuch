@@ -1,3 +1,4 @@
+import 'package:fartenbuch/src/core/presentation/app_scaffold.dart';
 import 'package:fartenbuch/src/features/auth/presentation/login_screen.dart';
 import 'package:fartenbuch/src/features/auth/presentation/verification_screen_acount.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    return AppScaffold(
       appBar: AppBar(
         title: const Text(
           'Konto erstellen',
@@ -34,147 +37,169 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         ),
         centerTitle: true,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const SizedBox(height: 10),
-              const Text(
-                'Registrieren',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-              const Text(
-                'Erstelle ein Konto, um loszulegen!',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 10),
-
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'E-Mail Adresse eingeben',
-                  hintText: 'E-Mail Adresse',
-                ),
-              ),
-              // Neues Passwort
-              TextField(
-                controller: _passwordController,
-                obscureText: !_passwordVisible1,
-                decoration: InputDecoration(
-                  labelText: 'Passwort eingeben',
-                  hintText: 'Passwort',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _passwordVisible1
-                          ? FontAwesomeIcons.eyeSlash
-                          : FontAwesomeIcons.eye,
-                      size: 16,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: bottomInset > 0 ? bottomInset : 40,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  spacing: 16,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Registrieren',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _passwordVisible1 = !_passwordVisible1;
-                      });
-                    },
-                  ),
-                ),
-              ),
-
-              // Passwort bestätigen
-              TextField(
-                controller: _confirmController,
-                obscureText: !_passwordVisible2,
-                decoration: InputDecoration(
-                  labelText: 'Passwort bestätigen',
-                  hintText: 'Passwort',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _passwordVisible2
-                          ? FontAwesomeIcons.eyeSlash
-                          : FontAwesomeIcons.eye,
-                      size: 16,
+                    const Text(
+                      'Erstelle ein Konto, um loszulegen!',
+                      style: TextStyle(fontSize: 16),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _passwordVisible2 = !_passwordVisible2;
-                      });
-                    },
-                  ),
-                ),
-              ),
+                    const SizedBox(height: 5),
 
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    final pass1 = _passwordController.text;
-                    final pass2 = _confirmController.text;
-                    if (pass1 == pass2 && pass1.length >= 6) {
-                      // Erfolg: Weiterleiten oder speichern
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Registrierung erfolgreich"),
+                    // E-Mail
+                    TextField(
+                      decoration: const InputDecoration(
+                        labelText: 'E-Mail Adresse eingeben',
+                        hintText: 'E-Mail Adresse',
+                      ),
+                    ),
+
+                    // Neues Passwort
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: !_passwordVisible1,
+                      decoration: InputDecoration(
+                        labelText: 'Passwort eingeben',
+                        hintText: 'Passwort',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible1
+                                ? FontAwesomeIcons.eyeSlash
+                                : FontAwesomeIcons.eye,
+                            size: 16,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible1 = !_passwordVisible1;
+                            });
+                          },
                         ),
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => const VerificationScreenAccount(),
+                      ),
+                    ),
+
+                    // Passwort bestätigen
+                    TextField(
+                      controller: _confirmController,
+                      obscureText: !_passwordVisible2,
+                      decoration: InputDecoration(
+                        labelText: 'Passwort bestätigen',
+                        hintText: 'Passwort',
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible2
+                                ? FontAwesomeIcons.eyeSlash
+                                : FontAwesomeIcons.eye,
+                            size: 16,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible2 = !_passwordVisible2;
+                            });
+                          },
                         ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Passwörter stimmen nicht überein"),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final pass1 = _passwordController.text;
+                          final pass2 = _confirmController.text;
+                          if (pass1 == pass2 && pass1.length >= 6) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Registrierung erfolgreich"),
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const VerificationScreenAccount(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Passwörter stimmen nicht überein",
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text('Registrieren'),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+                    Row(
+                      children: const [
+                        Expanded(child: Divider(color: Colors.grey)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('oder anmelden mit'),
                         ),
-                      );
-                    }
-                  },
-                  child: const Text('Registrieren'),
+                        Expanded(child: Divider(color: Colors.grey)),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+                    const SocialSignupRow(),
+                    Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 32),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Du hast noch kein Konto? "),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const LoginScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Jetzt einloggen",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 15),
-              Row(
-                children: const [
-                  Expanded(child: Divider(color: Colors.grey)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text('oder anmelden mit'),
-                  ),
-                  Expanded(child: Divider(color: Colors.grey)),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const SocialSignupRow(),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Du hast noch kein Konto? "),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginScreen()),
-                      );
-                    },
-                    child: const Text(
-                      "Jetzt einloggen",
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
