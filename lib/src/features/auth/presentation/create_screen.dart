@@ -3,6 +3,7 @@ import 'package:fartenbuch/src/features/auth/presentation/login_screen.dart';
 import 'package:fartenbuch/src/features/auth/presentation/verification_screen_acount.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -15,14 +16,59 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   bool _passwordVisible1 = false;
   bool _passwordVisible2 = false;
 
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
 
   @override
   void dispose() {
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
+  }
+
+  Future<void> _register() async {
+    final email = _emailController.text.trim();
+    final pass1 = _passwordController.text;
+    final pass2 = _confirmController.text;
+
+    if (pass1 != pass2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwörter stimmen nicht überein")),
+      );
+      return;
+    }
+
+    if (pass1.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Passwort muss mindestens 6 Zeichen lang sein"),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: pass1,
+      );
+
+      if (response.user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Bestätigungs-E-Mail wurde gesendet")),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const VerificationScreenAccount()),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Fehler: ${e.toString()}")));
+    }
   }
 
   @override
@@ -69,6 +115,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                     // E-Mail
                     TextField(
+                      controller: _emailController,
                       decoration: const InputDecoration(
                         labelText: 'E-Mail Adresse eingeben',
                         hintText: 'E-Mail Adresse',
@@ -125,33 +172,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          final pass1 = _passwordController.text;
-                          final pass2 = _confirmController.text;
-                          if (pass1 == pass2 && pass1.length >= 6) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Registrierung erfolgreich"),
-                              ),
-                            );
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const VerificationScreenAccount(),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "Passwörter stimmen nicht überein",
-                                ),
-                              ),
-                            );
-                          }
-                        },
+                        onPressed: _register,
                         child: const Text('Registrieren'),
                       ),
                     ),
@@ -170,13 +191,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                     const SizedBox(height: 10),
                     const SocialSignupRow(),
-                    Spacer(),
+                    const Spacer(),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 32),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Du hast noch kein Konto? "),
+                          const Text("Du hast bereits ein Konto? "),
                           TextButton(
                             onPressed: () {
                               Navigator.pushReplacement(
@@ -234,7 +255,7 @@ class SocialIconButton extends StatelessWidget {
       width: 100,
       height: 70,
       decoration: BoxDecoration(
-        color: const Color(0xFFEAEAFF), // helles Violett/Blau
+        color: const Color(0xFFEAEAFF),
         borderRadius: BorderRadius.circular(20),
       ),
       child: IconButton(

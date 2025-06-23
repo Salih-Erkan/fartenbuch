@@ -30,7 +30,7 @@ icons_launcher:
     android:
       enable: true
       adaptive_background_color: "#2196F3"
-      adaptive_foreground_image: "assets/icons/icon_foreground.png"
+      adaptive_foreground_image: "assets/icons/app_icon.png"
     ios:
       enable: true
       image_path: "assets/icons/app_icon.png"
