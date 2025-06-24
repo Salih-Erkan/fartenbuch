@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
 abstract class AppTheme {
-  static final Theme = ThemeData(
+  static final theme = ThemeData(
     primarySwatch: Colors.blue, // macht App-Leiste & Buttons blau
     scaffoldBackgroundColor: Colors.white, // Hintergrundfarbe
+
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.blue,
       foregroundColor: Colors.white,
-      titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       centerTitle: true,
+    ),
+    textTheme: TextTheme(
+      titleLarge: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.white, // wichtig für AppBar in Material3
+      ),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: Colors.blue,

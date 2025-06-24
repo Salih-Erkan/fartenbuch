@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fartenbuch/src/data/mock_database_repository.dart';
 
 class FahranlassScreen extends StatefulWidget {
-  FahranlassScreen({super.key});
+  const FahranlassScreen({super.key});
 
   @override
   State<FahranlassScreen> createState() => _FahranlassScreenState();
@@ -14,13 +14,11 @@ class FahranlassScreen extends StatefulWidget {
 
 class _FahranlassScreenState extends State<FahranlassScreen> {
   final DatabaseRepository repository = MockDatabaseRepository();
-  late Future<List<Fahranlass>> _futureKategorien;
-  List<Fahranlass> _kategorien = [];
+  final List<Fahranlass> _kategorien = [];
 
   @override
   void initState() {
     super.initState();
-    _futureKategorien = repository.getFahranlaesse();
   }
 
   @override
@@ -28,10 +26,7 @@ class _FahranlassScreenState extends State<FahranlassScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Fahranlass auswählen',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-        ),
+        title: const Text('Fahranlass auswählen'),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(

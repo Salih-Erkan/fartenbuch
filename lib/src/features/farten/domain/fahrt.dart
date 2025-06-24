@@ -6,7 +6,6 @@ class Fahrt {
   final Adresse ziel;
   final int entfernung;
   final String datum;
-  final String beschreibung;
   final String abfahrtUhrzeit;
   final String ankunftUhrzeit;
   final int kmStart;
@@ -21,7 +20,6 @@ class Fahrt {
     required this.ziel,
     required this.entfernung,
     required this.datum,
-    required this.beschreibung,
     required this.abfahrtUhrzeit,
     required this.ankunftUhrzeit,
     required this.kmStart,

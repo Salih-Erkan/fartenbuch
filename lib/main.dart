@@ -26,7 +26,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Fahrtenbuch',
-      theme: AppTheme.Theme,
+      theme: AppTheme.theme,
       home: const SplashScreen(),
     );
   }

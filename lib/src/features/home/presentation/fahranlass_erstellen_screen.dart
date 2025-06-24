@@ -66,7 +66,6 @@ class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
     FontAwesomeIcons.bolt,
     FontAwesomeIcons.gear,
     FontAwesomeIcons.children,
-    FontAwesomeIcons.child, // NEU
     FontAwesomeIcons.peopleGroup, // NEU
     FontAwesomeIcons.hospital, // NEU
     FontAwesomeIcons.landmark, // NEU

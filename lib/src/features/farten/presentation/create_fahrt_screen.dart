@@ -1,15 +1,13 @@
+import 'package:fartenbuch/src/core/presentation/app_scaffold.dart';
 import 'package:fartenbuch/src/core/services/directions_service.dart';
+import 'package:fartenbuch/src/features/farten/domain/create_fahrt/place_util.dart';
+import 'package:fartenbuch/src/features/farten/domain/create_fahrt/fahrt_util.dart';
+import 'package:fartenbuch/src/features/farten/presentation/widgets/map.dart';
 import 'package:flutter/material.dart';
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
-import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 import 'package:fartenbuch/src/data/database_repository.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:async';
-
-String? googleApiKey = dotenv.env['DEIN_GOOGLE_API_KEY'];
 
 class CreateFahrtScreen extends StatefulWidget {
   final String fahrtenanlassId;
@@ -38,9 +36,11 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  bool _showMap = false;
+  bool _mapWasInitialized = false;
+
   final _startAdressController = TextEditingController();
   final _zielAdressController = TextEditingController();
-  final _beschreibungController = TextEditingController();
 
   final _kmStartController = TextEditingController();
   final _kmEndeController = TextEditingController();
@@ -52,17 +52,6 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   List<String> _zielSuggestions = [];
 
   final DirectionsService _directionsService = DirectionsService();
-
-  @override
-  void initState() {
-    super.initState();
-    DateTime now = DateTime.now();
-    _datum =
-        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-    _abfahrt =
-        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
-    _ankunft = _abfahrt;
-  }
 
   String _datum = '';
   String _entfernung = '';
@@ -77,10 +66,34 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   LatLng? _zielLatLng;
 
   @override
+  void initState() {
+    super.initState();
+    DateTime now = DateTime.now();
+    _datum =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    _abfahrt =
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    _ankunft = _abfahrt;
+
+    if (_mapWasInitialized) {
+      _showMap = true;
+    } else {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) {
+          setState(() {
+            _showMap = true;
+            _mapWasInitialized =
+                true; // merken, dass Map nun einmal gezeigt wurde
+          });
+        }
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _startAdressController.dispose();
     _zielAdressController.dispose();
-    _beschreibungController.dispose();
     _kmStartController.dispose();
     _kmEndeController.dispose();
     _typController.dispose();
@@ -93,15 +106,7 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   void _onAddressChanged(String input, bool isStart) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
-      final url =
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&key=$googleApiKey&language=de&components=country:de';
-      final response = await http.get(Uri.parse(url));
-      final json = jsonDecode(response.body);
-      final suggestions =
-          (json['predictions'] as List)
-              .map((p) => p['description'] as String)
-              .toList();
-
+      final suggestions = await PlaceUtil.getSuggestions(input);
       setState(() {
         if (isStart) {
           _startSuggestions = suggestions;
@@ -112,143 +117,85 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
     });
   }
 
-  Future<void> _maybeCalculateRoute() async {
-    if (_startLatLng != null && _zielLatLng != null) {
-      final result = await _directionsService.getRouteWithDistance(
-        origin: _startLatLng!,
-        destination: _zielLatLng!,
-      );
-
-      _entfernung = result.distanceInKm.toString();
-
-      setState(() {
-        _polylines = {
-          Polyline(
-            polylineId: const PolylineId('route'),
-            points: result.route,
-            color: Colors.blue,
-            width: 5,
-          ),
-        };
-      });
-
-      _mapController?.animateCamera(
-        CameraUpdate.newLatLngBounds(
-          LatLngBounds(
-            southwest: LatLng(
-              _startLatLng!.latitude < _zielLatLng!.latitude
-                  ? _startLatLng!.latitude
-                  : _zielLatLng!.latitude,
-              _startLatLng!.longitude < _zielLatLng!.longitude
-                  ? _startLatLng!.longitude
-                  : _zielLatLng!.longitude,
-            ),
-            northeast: LatLng(
-              _startLatLng!.latitude > _zielLatLng!.latitude
-                  ? _startLatLng!.latitude
-                  : _zielLatLng!.latitude,
-              _startLatLng!.longitude > _zielLatLng!.longitude
-                  ? _startLatLng!.longitude
-                  : _zielLatLng!.longitude,
-            ),
-          ),
-          60,
-        ),
-      );
-    }
-  }
-
   Future<void> _setSelectedPlace(String description, bool isStart) async {
-    final url =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$description&key=$googleApiKey&language=de&components=country:de';
-    final res = await http.get(Uri.parse(url));
-    final predictions = jsonDecode(res.body)['predictions'];
-    if (predictions.isEmpty) return;
+    final result = await PlaceUtil.getPlaceDetails(description);
+    if (result == null) return;
 
-    final placeId = predictions[0]['place_id'];
-    final detailsUrl =
-        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$googleApiKey';
-    final detailsRes = await http.get(Uri.parse(detailsUrl));
-    final result = jsonDecode(detailsRes.body)['result'];
     final location = result['geometry']['location'];
-
-    final lat = location['lat'];
-    final lng = location['lng'];
-    final position = LatLng(lat, lng);
-
-    final addressComponents = result['address_components'];
-
-    String getComponent(String type) {
-      for (var c in addressComponents) {
-        final types = c['types'];
-        if (types is List && types.contains(type)) {
-          return c['long_name'] ?? '';
-        }
-      }
-      return '';
-    }
-
-    if (isStart) {
-      startort = getComponent('locality');
-      startstrasse = getComponent('route');
-      starthausnummer = getComponent('street_number');
-      startplz = getComponent('postal_code');
-    } else {
-      zielort = getComponent('locality');
-      zielstrasse = getComponent('route');
-      zielhausnummer = getComponent('street_number');
-      zielplz = getComponent('postal_code');
-    }
+    final position = LatLng(location['lat'], location['lng']);
+    final components = PlaceUtil.getAddressComponents(result);
 
     setState(() {
       if (isStart) {
         _startAdressController.text = description;
         _startLatLng = position;
         _startSuggestions.clear();
+        startort = components['ort'] ?? '';
+        startstrasse = components['strasse'] ?? '';
+        starthausnummer = components['hausnummer'] ?? '';
+        startplz = components['plz'] ?? '';
       } else {
         _zielAdressController.text = description;
         _zielLatLng = position;
         _zielSuggestions.clear();
+        zielort = components['ort'] ?? '';
+        zielstrasse = components['strasse'] ?? '';
+        zielhausnummer = components['hausnummer'] ?? '';
+        zielplz = components['plz'] ?? '';
       }
     });
 
-    _maybeCalculateRoute();
+    if (_startLatLng != null && _zielLatLng != null) {
+      await FahrtHelper.maybeCalculateRoute(
+        startLatLng: _startLatLng!,
+        zielLatLng: _zielLatLng!,
+        directionsService: _directionsService,
+        onPolylinesChanged:
+            (newPolylines) => setState(() => _polylines = newPolylines),
+        onCameraUpdate:
+            (bounds) => _mapController?.animateCamera(
+              CameraUpdate.newLatLngBounds(bounds, 60),
+            ),
+        onDistanceCalculated:
+            (distance) => setState(() => _entfernung = distance),
+      );
+    }
   }
 
-  void _saveFahrt() async {
-    if (_formKey.currentState!.validate()) {
-      final fahrt = Fahrt(
-        fahrtenanlassId: widget.fahrtenanlassId,
-        beschreibung: _beschreibungController.text,
-        datum: _datum,
-        entfernung: int.tryParse(_entfernung) ?? 0,
-        abfahrtUhrzeit: _abfahrt,
-        ankunftUhrzeit: _ankunft,
-        kmStart: int.tryParse(_kmStartController.text) ?? 0,
-        kmEnde: int.tryParse(_kmEndeController.text) ?? 0,
-        typ: _typController.text,
-        firma: _firmaController.text,
-        kontakt: _kontaktController.text,
-        start: Adresse(
-          ort: startort,
-          strasse: startstrasse,
-          hausnummer: starthausnummer,
-          plz: startplz,
-          lat: _startLatLng?.latitude ?? 0,
-          lng: _startLatLng?.longitude ?? 0,
-        ),
-        ziel: Adresse(
-          ort: zielort,
-          strasse: zielstrasse,
-          hausnummer: zielhausnummer,
-          plz: zielplz,
-          lat: _zielLatLng?.latitude ?? 0,
-          lng: _zielLatLng?.longitude ?? 0,
-        ),
-      );
-      widget.repository.saveFahrt(fahrt);
-      if (context.mounted) Navigator.pop(context, fahrt);
-    }
+  Future<void> _saveFahrt() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    await FahrtHelper.saveFahrt(
+      context: context,
+      formKey: _formKey,
+      fahrtenanlassId: widget.fahrtenanlassId,
+      datum: _datum,
+      entfernung: _entfernung,
+      abfahrt: _abfahrt,
+      ankunft: _ankunft,
+      kmStart: _kmStartController.text,
+      kmEnde: _kmEndeController.text,
+      typ: _typController.text,
+      firma: _firmaController.text,
+      kontakt: _kontaktController.text,
+      start: Adresse(
+        ort: startort,
+        strasse: startstrasse,
+        hausnummer: starthausnummer,
+        plz: startplz,
+        lat: _startLatLng?.latitude ?? 0,
+        lng: _startLatLng?.longitude ?? 0,
+      ),
+      ziel: Adresse(
+        ort: zielort,
+        strasse: zielstrasse,
+        hausnummer: zielhausnummer,
+        plz: zielplz,
+        lat: _zielLatLng?.latitude ?? 0,
+        lng: _zielLatLng?.longitude ?? 0,
+      ),
+      repository: widget.repository,
+    );
   }
 
   String? _required(String? value) {
@@ -260,44 +207,18 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: const Text('Neue Fahrt erstellen')),
-      body: SingleChildScrollView(
+      child: SingleChildScrollView(
         child: Column(
           children: [
-            Card(
-              margin: const EdgeInsets.all(8.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              elevation: 4,
-              child: SizedBox(
-                height: 250,
-                child: GoogleMap(
-                  onMapCreated: (controller) => _mapController = controller,
-                  initialCameraPosition: CameraPosition(
-                    target: _startLatLng ?? const LatLng(52.52, 13.4050),
-                    zoom: 12,
-                  ),
-                  markers: {
-                    if (_startLatLng != null)
-                      Marker(
-                        markerId: const MarkerId("start"),
-                        position: _startLatLng!,
-                        infoWindow: const InfoWindow(title: "Start"),
-                      ),
-                    if (_zielLatLng != null)
-                      Marker(
-                        markerId: const MarkerId("ziel"),
-                        position: _zielLatLng!,
-                        infoWindow: const InfoWindow(title: "Ziel"),
-                      ),
-                  },
-                  polylines: _polylines,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                ),
-              ),
+            MapCard(
+              showMap: _showMap,
+              mapController: _mapController,
+              onMapCreated: (controller) => _mapController = controller,
+              startLatLng: _startLatLng,
+              zielLatLng: _zielLatLng,
+              polylines: _polylines,
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -305,6 +226,7 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
                 key: _formKey,
                 child: Column(
                   spacing: 16,
+
                   children: [
                     TextFormField(
                       controller: _startAdressController,
@@ -333,13 +255,6 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
                         title: Text(s),
                         onTap: () => _setSelectedPlace(s, false),
                       ),
-                    ),
-                    TextFormField(
-                      controller: _beschreibungController,
-                      decoration: const InputDecoration(
-                        labelText: 'Beschreibung',
-                      ),
-                      validator: _required,
                     ),
                     TextFormField(
                       controller: _kmStartController,
