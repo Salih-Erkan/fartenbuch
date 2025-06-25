@@ -2,28 +2,32 @@ import 'package:fartenbuch/src/core/presentation/app_scaffold.dart';
 import 'package:fartenbuch/src/core/services/directions_service.dart';
 import 'package:fartenbuch/src/features/farten/domain/create_fahrt/place_util.dart';
 import 'package:fartenbuch/src/features/farten/domain/create_fahrt/fahrt_util.dart';
-import 'package:fartenbuch/src/features/farten/presentation/widgets/map.dart';
+import 'package:fartenbuch/src/features/farten/presentation/map/map_init_cache_provider.dart';
+import 'package:fartenbuch/src/features/farten/presentation/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
 import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 
-class CreateFahrtScreen extends StatefulWidget {
-  final String fahrtenanlassId;
-  final DatabaseRepository repository;
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✔ RICHTIG!
 
+class CreateFahrtScreen extends ConsumerStatefulWidget {
   const CreateFahrtScreen({
     super.key,
     required this.fahrtenanlassId,
     required this.repository,
   });
 
+  final String fahrtenanlassId;
+  final DatabaseRepository repository;
+
   @override
-  State<CreateFahrtScreen> createState() => _CreateFahrtScreenState();
+  ConsumerState<CreateFahrtScreen> createState() => _CreateFahrtScreenState(); // wichtig
 }
 
-class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
+class _CreateFahrtScreenState extends ConsumerState<CreateFahrtScreen>
+    with WidgetsBindingObserver {
   String startort = '';
   String startstrasse = '';
   String starthausnummer = '';
@@ -35,9 +39,6 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
   String zielplz = '';
 
   final _formKey = GlobalKey<FormState>();
-
-  bool _showMap = false;
-  bool _mapWasInitialized = false;
 
   final _startAdressController = TextEditingController();
   final _zielAdressController = TextEditingController();
@@ -75,16 +76,14 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
         "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
     _ankunft = _abfahrt;
 
-    if (_mapWasInitialized) {
-      _showMap = true;
-    } else {
+    WidgetsBinding.instance.addObserver(this);
+
+    final alreadyInitialized = ref.read(mapInitCacheProvider);
+
+    if (!alreadyInitialized) {
       Future.delayed(const Duration(milliseconds: 200), () {
         if (mounted) {
-          setState(() {
-            _showMap = true;
-            _mapWasInitialized =
-                true; // merken, dass Map nun einmal gezeigt wurde
-          });
+          ref.read(mapInitCacheProvider.notifier).state = true;
         }
       });
     }
@@ -100,6 +99,7 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
     _firmaController.dispose();
     _kontaktController.dispose();
     _debounce?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -213,7 +213,6 @@ class _CreateFahrtScreenState extends State<CreateFahrtScreen> {
         child: Column(
           children: [
             MapCard(
-              showMap: _showMap,
               mapController: _mapController,
               onMapCreated: (controller) => _mapController = controller,
               startLatLng: _startLatLng,

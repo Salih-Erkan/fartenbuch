@@ -1,34 +1,52 @@
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt_detail/map_util.dart';
-import 'package:fartenbuch/src/features/farten/presentation/widgets/map.dart';
+import 'package:fartenbuch/src/features/farten/presentation/map/map_init_cache_provider.dart';
+import 'package:fartenbuch/src/features/farten/presentation/map/map.dart';
 import 'package:fartenbuch/src/features/farten/presentation/widgets/fahrt_detail/row_entry.dart';
 import 'package:fartenbuch/src/features/farten/presentation/widgets/fahrt_detail/simple_row.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class FahrtDetailScreen extends StatefulWidget {
+class FahrtDetailScreen extends ConsumerStatefulWidget {
   final Fahrt fahrt;
 
   const FahrtDetailScreen({super.key, required this.fahrt});
 
   @override
-  State<FahrtDetailScreen> createState() => _FahrtDetailScreenState();
+  ConsumerState<FahrtDetailScreen> createState() => _FahrtDetailScreenState();
 }
 
-class _FahrtDetailScreenState extends State<FahrtDetailScreen> {
+class _FahrtDetailScreenState extends ConsumerState<FahrtDetailScreen>
+    with WidgetsBindingObserver {
   final Set<Polyline> _polylines = {};
   GoogleMapController? _mapController;
-  bool _showMap = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _showMap = true;
+
+    WidgetsBinding.instance.addObserver(this);
+
+    final alreadyInitialized = ref.read(mapInitCacheProvider);
+
+    if (!alreadyInitialized) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) {
+          ref.read(mapInitCacheProvider.notifier).state = true;
+          _loadRoute();
+        }
       });
+    } else {
       _loadRoute();
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _mapController?.dispose(); // gibt Speicher explizit frei
+    super.dispose();
   }
 
   Future<void> _loadRoute() async {
@@ -36,6 +54,8 @@ class _FahrtDetailScreenState extends State<FahrtDetailScreen> {
       origin: LatLng(widget.fahrt.start.lat, widget.fahrt.start.lng),
       destination: LatLng(widget.fahrt.ziel.lat, widget.fahrt.ziel.lng),
     );
+
+    if (!mounted) return;
 
     setState(() {
       _polylines.add(
@@ -63,7 +83,6 @@ class _FahrtDetailScreenState extends State<FahrtDetailScreen> {
       body: Column(
         children: [
           MapCard(
-            showMap: _showMap,
             mapController: _mapController,
             onMapCreated: (controller) => _mapController = controller,
             startLatLng: LatLng(widget.fahrt.start.lat, widget.fahrt.start.lng),
