@@ -1,26 +1,21 @@
 import 'package:fartenbuch/src/core/presentation/app_scaffold.dart';
 import 'package:fartenbuch/src/core/services/directions_service.dart';
+import 'package:fartenbuch/src/data/database_providers.dart';
 import 'package:fartenbuch/src/features/farten/domain/create_fahrt/place_util.dart';
 import 'package:fartenbuch/src/features/farten/domain/create_fahrt/fahrt_util.dart';
 import 'package:fartenbuch/src/features/farten/presentation/map/map_init_cache_provider.dart';
 import 'package:fartenbuch/src/features/farten/presentation/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
-import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✔ RICHTIG!
 
 class CreateFahrtScreen extends ConsumerStatefulWidget {
-  const CreateFahrtScreen({
-    super.key,
-    required this.fahrtenanlassId,
-    required this.repository,
-  });
+  const CreateFahrtScreen({super.key, required this.fahrtenanlassId});
 
   final String fahrtenanlassId;
-  final DatabaseRepository repository;
 
   @override
   ConsumerState<CreateFahrtScreen> createState() => _CreateFahrtScreenState(); // wichtig
@@ -165,6 +160,8 @@ class _CreateFahrtScreenState extends ConsumerState<CreateFahrtScreen>
   Future<void> _saveFahrt() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final repository = ref.watch(databaseRepositoryProvider);
+
     await FahrtHelper.saveFahrt(
       context: context,
       formKey: _formKey,
@@ -194,7 +191,7 @@ class _CreateFahrtScreenState extends ConsumerState<CreateFahrtScreen>
         lat: _zielLatLng?.latitude ?? 0,
         lng: _zielLatLng?.longitude ?? 0,
       ),
-      repository: widget.repository,
+      repository: repository,
     );
   }
 

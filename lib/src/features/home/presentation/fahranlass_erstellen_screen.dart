@@ -1,23 +1,30 @@
+import 'package:fartenbuch/src/data/database_providers.dart';
 import 'package:fartenbuch/src/data/database_repository.dart';
 //import 'package:fartenbuch/src/data/mock_database_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 
-class FahranlassErstellenScreen extends StatefulWidget {
-  final DatabaseRepository repository;
-
-  const FahranlassErstellenScreen({super.key, required this.repository});
-
+class FahranlassErstellenScreen extends ConsumerStatefulWidget {
   @override
-  State<FahranlassErstellenScreen> createState() =>
+  ConsumerState<FahranlassErstellenScreen> createState() =>
       _FahranlassErstellenScreenState();
 }
 
-class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
+class _FahranlassErstellenScreenState
+    extends ConsumerState<FahranlassErstellenScreen> {
+  late final DatabaseRepository repository;
+
   final nameController = TextEditingController();
   Color selectedColor = Colors.blue;
   IconData selectedIcon = FontAwesomeIcons.car;
+
+  @override
+  void initState() {
+    super.initState();
+    repository = ref.read(databaseRepositoryProvider);
+  }
 
   @override
   void dispose() {
@@ -73,16 +80,23 @@ class _FahranlassErstellenScreenState extends State<FahranlassErstellenScreen> {
 
   Future<void> _submit() async {
     final name = nameController.text.trim();
-    if (name.isEmpty) return;
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bitte gib einen Namen ein.')),
+      );
+      return;
+    }
 
     final neuerAnlass = Fahranlass(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
-      icon: selectedIcon,
+      iconCodePoint: selectedIcon.codePoint,
+      fontFamily: 'FontAwesomeSolid',
+      fontPackage: 'font_awesome_flutter',
       color: selectedColor,
     );
 
-    await widget.repository.createFahranlass(neuerAnlass);
+    await repository.createFahranlass(neuerAnlass);
 
     Navigator.pop(context, neuerAnlass);
   }

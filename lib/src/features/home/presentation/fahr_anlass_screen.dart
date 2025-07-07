@@ -1,24 +1,26 @@
+import 'package:fartenbuch/src/data/database_providers.dart';
 import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:fartenbuch/src/features/home/presentation/fahranlass_erstellen_screen.dart';
 import 'package:fartenbuch/src/features/home/presentation/widget/fahranlass_card.dart';
 import 'package:flutter/material.dart';
-import 'package:fartenbuch/src/data/mock_database_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FahranlassScreen extends StatefulWidget {
+class FahranlassScreen extends ConsumerStatefulWidget {
   const FahranlassScreen({super.key});
 
   @override
-  State<FahranlassScreen> createState() => _FahranlassScreenState();
+  ConsumerState<FahranlassScreen> createState() => _FahranlassScreenState();
 }
 
-class _FahranlassScreenState extends State<FahranlassScreen> {
-  final DatabaseRepository repository = MockDatabaseRepository();
+class _FahranlassScreenState extends ConsumerState<FahranlassScreen> {
+  late final DatabaseRepository repository;
   final List<Fahranlass> _kategorien = [];
 
   @override
   void initState() {
     super.initState();
+    repository = ref.read(databaseRepositoryProvider);
   }
 
   @override
@@ -34,9 +36,7 @@ class _FahranlassScreenState extends State<FahranlassScreen> {
           final neuerAnlass = await Navigator.push<Fahranlass>(
             context,
             MaterialPageRoute(
-              builder:
-                  (context) =>
-                      FahranlassErstellenScreen(repository: repository),
+              builder: (context) => FahranlassErstellenScreen(),
             ),
           );
 

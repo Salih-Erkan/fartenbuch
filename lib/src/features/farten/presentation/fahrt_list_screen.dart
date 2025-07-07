@@ -1,3 +1,5 @@
+import 'package:fartenbuch/src/data/database_providers.dart';
+import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:fartenbuch/src/data/mock_database_repository.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 import 'package:fartenbuch/src/features/farten/presentation/create_fahrt_screen.dart';
@@ -5,23 +7,25 @@ import 'package:fartenbuch/src/features/farten/presentation/fahrt_detail_screen.
 import 'package:fartenbuch/src/features/farten/presentation/widgets/fahrt_list/fahrt_info.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FahrtListScreen extends StatefulWidget {
+class FahrtListScreen extends ConsumerStatefulWidget {
   final Fahranlass fahrtAnlass;
 
   const FahrtListScreen({super.key, required this.fahrtAnlass});
 
   @override
-  State<FahrtListScreen> createState() => _FahrtListScreenState();
+  ConsumerState<FahrtListScreen> createState() => _FahrtListScreenState();
 }
 
-class _FahrtListScreenState extends State<FahrtListScreen> {
-  final repository = MockDatabaseRepository();
+class _FahrtListScreenState extends ConsumerState<FahrtListScreen> {
+  late final DatabaseRepository repository;
   late Future<List<Fahrt>> _fahrtenFuture;
 
   @override
   void initState() {
     super.initState();
+    repository = ref.read(databaseRepositoryProvider);
     _ladeFahrten();
   }
 
@@ -82,7 +86,6 @@ class _FahrtListScreenState extends State<FahrtListScreen> {
                 builder:
                     (_) => CreateFahrtScreen(
                       fahrtenanlassId: widget.fahrtAnlass.id,
-                      repository: repository,
                     ),
               ),
             );

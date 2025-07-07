@@ -36,7 +36,15 @@ class FahranlassCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(cat.icon, size: 32, color: cat.color),
+            Icon(
+              IconData(
+                cat.iconCodePoint,
+                fontFamily: cat.fontFamily,
+                fontPackage: cat.fontPackage,
+              ),
+              size: 32,
+              color: cat.color,
+            ),
             const SizedBox(height: 10),
             Text(
               cat.name,
