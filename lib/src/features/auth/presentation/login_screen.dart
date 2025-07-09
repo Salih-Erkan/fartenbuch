@@ -64,9 +64,7 @@ class LoginScreen extends StatelessWidget {
                           hintText: 'Passwort',
                           suffixIcon: IconButton(
                             icon: Icon(FontAwesomeIcons.eye, size: 16),
-                            onPressed: () {
-                              // TODO: Passwort-Sichtbarkeit toggeln
-                            },
+                            onPressed: () {},
                           ),
                         ),
                       ),
@@ -91,9 +89,7 @@ class LoginScreen extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: E-Mail/Passwort-Login (optional)
-                          },
+                          onPressed: () {},
                           child: const Text('Anmelden'),
                         ),
                       ),

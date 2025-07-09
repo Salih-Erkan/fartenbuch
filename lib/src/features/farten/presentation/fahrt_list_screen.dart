@@ -1,6 +1,5 @@
 import 'package:fartenbuch/src/data/database_providers.dart';
 import 'package:fartenbuch/src/data/database_repository.dart';
-import 'package:fartenbuch/src/data/mock_database_repository.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 import 'package:fartenbuch/src/features/farten/presentation/create_fahrt_screen.dart';
 import 'package:fartenbuch/src/features/farten/presentation/fahrt_detail_screen.dart';

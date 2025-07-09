@@ -1,5 +1,3 @@
-import 'package:fartenbuch/src/data/database_repository.dart';
-import 'package:fartenbuch/src/data/supabase_database_repository.dart';
 import 'package:fartenbuch/src/features/splash/splash_screen.dart';
 //import 'package:fartenbuch/src/features/splash/splash_screen1.dart';
 import 'package:fartenbuch/src/theme/app_theme.dart';

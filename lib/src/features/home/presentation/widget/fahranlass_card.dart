@@ -1,7 +1,6 @@
 import 'package:fartenbuch/src/features/farten/presentation/fahrt_list_screen.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FahranlassCard extends StatelessWidget {
   const FahranlassCard({super.key, required this.context, required this.cat});

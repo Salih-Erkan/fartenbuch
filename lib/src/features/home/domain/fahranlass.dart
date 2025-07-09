@@ -19,4 +19,26 @@ class Fahranlass {
 
   IconData get icon =>
       IconData(iconCodePoint, fontFamily: fontFamily, fontPackage: fontPackage);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'icon_code_point': iconCodePoint,
+      'font_family': fontFamily,
+      'font_package': fontPackage,
+      'color': color.value,
+    };
+  }
+
+  factory Fahranlass.fromMap(Map<String, dynamic> map) {
+    return Fahranlass(
+      id: map['id'],
+      name: map['name'],
+      iconCodePoint: map['icon_code_point'],
+      fontFamily: map['font_family'],
+      fontPackage: map['font_package'],
+      color: Color(map['color']),
+    );
+  }
 }

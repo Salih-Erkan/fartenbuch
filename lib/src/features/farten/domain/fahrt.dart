@@ -28,4 +28,38 @@ class Fahrt {
     required this.firma,
     required this.kontakt,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'fahrtenanlass_id': fahrtenanlassId,
+      'datum': datum,
+      'abfahrt_uhrzeit': abfahrtUhrzeit,
+      'ankunft_uhrzeit': ankunftUhrzeit,
+      'entfernung': entfernung,
+      'km_start': kmStart,
+      'km_ende': kmEnde,
+      'typ': typ,
+      'firma': firma,
+      'kontakt': kontakt,
+      ...start.toStartMap(),
+      ...ziel.toTargetMap(),
+    };
+  }
+
+  factory Fahrt.fromMap(Map<String, dynamic> map) {
+    return Fahrt(
+      fahrtenanlassId: map['fahrtenanlass_id'],
+      datum: map['datum'],
+      abfahrtUhrzeit: map['abfahrt_uhrzeit'],
+      ankunftUhrzeit: map['ankunft_uhrzeit'],
+      entfernung: map['entfernung'],
+      kmStart: map['km_start'],
+      kmEnde: map['km_ende'],
+      typ: map['typ'],
+      firma: map['firma'],
+      kontakt: map['kontakt'],
+      start: Adresse.fromStartMap(map),
+      ziel: Adresse.fromZielMap(map),
+    );
+  }
 }

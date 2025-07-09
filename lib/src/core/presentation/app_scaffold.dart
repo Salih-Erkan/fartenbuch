@@ -7,12 +7,12 @@ class AppScaffold extends StatelessWidget {
   final Color? backgroundColor;
 
   const AppScaffold({
-    Key? key,
+    super.key,
     required this.child,
     this.appBar,
     this.floatingActionButton,
     this.backgroundColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

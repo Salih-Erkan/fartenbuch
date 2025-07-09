@@ -135,7 +135,6 @@ class MockDatabaseRepository implements DatabaseRepository {
 
   @override
   Future<List<Fahranlass>> getFahranlaesse() async {
-    // TODO: implement getFahranlaesse
     return _fahranleasse;
   }
 
@@ -146,7 +145,6 @@ class MockDatabaseRepository implements DatabaseRepository {
 
   @override
   Future<List<Fahrt>> getFahrten(String fahranlassId) async {
-    // TODO: implement getFahrten
     return fahrten
         .where((fahrt) => fahrt.fahrtenanlassId == fahranlassId)
         .toList();
