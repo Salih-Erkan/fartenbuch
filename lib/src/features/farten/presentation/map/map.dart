@@ -1,4 +1,4 @@
-import 'package:fartenbuch/src/features/farten/presentation/map/map_init_cache_provider.dart';
+import 'package:fartenbuch/src/features/farten/presentation/providers/map_init_cache_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,32 +29,33 @@ class MapCard extends ConsumerWidget {
       elevation: 4,
       child: SizedBox(
         height: 250,
-        child: showMap
-            ? GoogleMap(
-                onMapCreated: onMapCreated,
-                initialCameraPosition: CameraPosition(
-                  target: startLatLng ?? const LatLng(52.52, 13.4050),
-                  zoom: 12,
-                ),
-                markers: {
-                  if (startLatLng != null)
-                    Marker(
-                      markerId: const MarkerId("start"),
-                      position: startLatLng!,
-                      infoWindow: const InfoWindow(title: "Start"),
-                    ),
-                  if (zielLatLng != null)
-                    Marker(
-                      markerId: const MarkerId("ziel"),
-                      position: zielLatLng!,
-                      infoWindow: const InfoWindow(title: "Ziel"),
-                    ),
-                },
-                polylines: polylines,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
-              )
-            : const Center(child: CircularProgressIndicator()),
+        child:
+            showMap
+                ? GoogleMap(
+                  onMapCreated: onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: startLatLng ?? const LatLng(52.52, 13.4050),
+                    zoom: 12,
+                  ),
+                  markers: {
+                    if (startLatLng != null)
+                      Marker(
+                        markerId: const MarkerId("start"),
+                        position: startLatLng!,
+                        infoWindow: const InfoWindow(title: "Start"),
+                      ),
+                    if (zielLatLng != null)
+                      Marker(
+                        markerId: const MarkerId("ziel"),
+                        position: zielLatLng!,
+                        infoWindow: const InfoWindow(title: "Ziel"),
+                      ),
+                  },
+                  polylines: polylines,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
+                )
+                : const Center(child: CircularProgressIndicator()),
       ),
     );
   }

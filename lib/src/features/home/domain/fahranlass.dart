@@ -27,6 +27,7 @@ class Fahranlass {
       'icon_code_point': iconCodePoint,
       'font_family': fontFamily,
       'font_package': fontPackage,
+      // ignore: deprecated_member_use
       'color': color.value,
     };
   }

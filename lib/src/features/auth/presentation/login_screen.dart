@@ -116,6 +116,7 @@ class LoginScreen extends StatelessWidget {
                                   'com.example.fahrtenbuch://login-callback/', // anpassen
                             );
                           } catch (e) {
+                            // ignore: use_build_context_synchronously
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Login fehlgeschlagen: $e'),

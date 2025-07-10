@@ -138,9 +138,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       children: [
                         const Text('Code nicht erhalten? '),
                         TextButton(
-                          onPressed: () {
-                            // TODO: Code erneut senden
-                          },
+                          onPressed: () {},
                           child: const Text(
                             'Erneut senden',
                             style: TextStyle(color: Colors.blue),

@@ -3,7 +3,9 @@ import 'package:fartenbuch/src/core/services/directions_service.dart';
 import 'package:fartenbuch/src/data/database_providers.dart';
 import 'package:fartenbuch/src/features/farten/domain/create_fahrt/place_util.dart';
 import 'package:fartenbuch/src/features/farten/domain/create_fahrt/fahrt_util.dart';
-import 'package:fartenbuch/src/features/farten/presentation/map/map_init_cache_provider.dart';
+import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
+import 'package:fartenbuch/src/features/farten/presentation/providers/fahrten_provider.dart';
+import 'package:fartenbuch/src/features/farten/presentation/providers/map_init_cache_provider.dart';
 import 'package:fartenbuch/src/features/farten/presentation/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
@@ -162,16 +164,14 @@ class _CreateFahrtScreenState extends ConsumerState<CreateFahrtScreen>
 
     final repository = ref.watch(databaseRepositoryProvider);
 
-    await FahrtHelper.saveFahrt(
-      context: context,
-      formKey: _formKey,
+    final neueFahrt = Fahrt(
       fahrtenanlassId: widget.fahrtenanlassId,
       datum: _datum,
-      entfernung: _entfernung,
-      abfahrt: _abfahrt,
-      ankunft: _ankunft,
-      kmStart: _kmStartController.text,
-      kmEnde: _kmEndeController.text,
+      entfernung: int.tryParse(_entfernung) ?? 0,
+      abfahrtUhrzeit: _abfahrt,
+      ankunftUhrzeit: _ankunft,
+      kmStart: int.tryParse(_kmStartController.text) ?? 0,
+      kmEnde: int.tryParse(_kmEndeController.text) ?? 0,
       typ: _typController.text,
       firma: _firmaController.text,
       kontakt: _kontaktController.text,
@@ -191,8 +191,13 @@ class _CreateFahrtScreenState extends ConsumerState<CreateFahrtScreen>
         lat: _zielLatLng?.latitude ?? 0,
         lng: _zielLatLng?.longitude ?? 0,
       ),
-      repository: repository,
     );
+
+    await repository.saveFahrt(neueFahrt);
+
+    ref.invalidate(fahrtenProvider(widget.fahrtenanlassId));
+    // ignore: use_build_context_synchronously
+    if (context.mounted) Navigator.pop(context, neueFahrt);
   }
 
   String? _required(String? value) {

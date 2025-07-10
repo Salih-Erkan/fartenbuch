@@ -1,6 +1,6 @@
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt_detail/map_util.dart';
-import 'package:fartenbuch/src/features/farten/presentation/map/map_init_cache_provider.dart';
+import 'package:fartenbuch/src/features/farten/presentation/providers/map_init_cache_provider.dart';
 import 'package:fartenbuch/src/features/farten/presentation/map/map.dart';
 import 'package:fartenbuch/src/features/farten/presentation/widgets/fahrt_detail/row_entry.dart';
 import 'package:fartenbuch/src/features/farten/presentation/widgets/fahrt_detail/simple_row.dart';

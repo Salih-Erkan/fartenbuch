@@ -65,7 +65,6 @@ class GuestInfoSheet extends StatelessWidget {
                       ),
                       (route) => false,
                     );
-                    ;
                     // Weiter als Gast
                   },
                   child: Text(

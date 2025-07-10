@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 
 class FahranlassErstellenScreen extends ConsumerStatefulWidget {
+  const FahranlassErstellenScreen({super.key});
   @override
   ConsumerState<FahranlassErstellenScreen> createState() =>
       _FahranlassErstellenScreenState();
@@ -97,7 +98,7 @@ class _FahranlassErstellenScreenState
     );
 
     await repository.createFahranlass(neuerAnlass);
-
+    // ignore: use_build_context_synchronously
     Navigator.pop(context, neuerAnlass);
   }
 

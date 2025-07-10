@@ -17,6 +17,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
     // Simulierter Ladeprozess → nach 3 Sekunden zum HomeScreen
     Future.delayed(const Duration(seconds: 7), () {
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const WelcomeScreen()),
         );
