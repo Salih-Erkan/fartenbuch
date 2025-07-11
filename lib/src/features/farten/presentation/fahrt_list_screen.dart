@@ -2,8 +2,8 @@ import 'package:fartenbuch/src/data/database_providers.dart';
 import 'package:fartenbuch/src/data/database_repository.dart';
 import 'package:fartenbuch/src/features/farten/domain/fahrt.dart';
 import 'package:fartenbuch/src/features/farten/presentation/create_fahrt_screen.dart';
-import 'package:fartenbuch/src/features/farten/presentation/fahrt_detail_screen.dart';
-import 'package:fartenbuch/src/features/farten/presentation/widgets/fahrt_list/fahrt_info.dart';
+import 'package:fartenbuch/src/features/farten/presentation/fahrt_pdf_export.dart';
+import 'package:fartenbuch/src/features/farten/presentation/widgets/fahrt_list/fahrt_card.dart';
 import 'package:fartenbuch/src/features/home/domain/fahranlass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,49 +72,48 @@ class _FahrtListScreenState extends ConsumerState<FahrtListScreen> {
               itemCount: fahrten.length,
               itemBuilder: (context, index) {
                 final fahrt = fahrten[index];
-                return _buildFahrtCard(context, fahrt);
+                return FahrtCard(context: context, fahrt: fahrt);
               },
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (_) => CreateFahrtScreen(
-                      fahrtenanlassId: widget.fahrtAnlass.id,
-                    ),
-              ),
-            );
-            if (result != null) {
-              // Nach dem Rückkehr neu laden
-              setState(_ladeFahrten);
-            }
-          },
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
-  }
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              heroTag: 'add_btn',
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) => CreateFahrtScreen(
+                          fahrtenanlassId: widget.fahrtAnlass.id,
+                        ),
+                  ),
+                );
+                if (result != null) {
+                  setState(_ladeFahrten);
+                }
+              },
+              backgroundColor: Colors.blue,
+              tooltip: 'Neue Fahrt hinzufügen',
+              child: const Icon(Icons.add),
+            ),
+            const SizedBox(height: 16),
 
-  Widget _buildFahrtCard(BuildContext context, Fahrt fahrt) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => FahrtDetailScreen(fahrt: fahrt)),
-        );
-      },
-      child: Card(
-        color: Colors.white,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        elevation: 3,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: FahrtInfo(fahrt: fahrt),
+            FloatingActionButton(
+              heroTag: 'pdf_btn',
+              onPressed: () async {
+                final fahrten = await _fahrtenFuture;
+                await FahrtPdfExporter.export(fahrten);
+              },
+              backgroundColor: Colors.redAccent,
+              tooltip: 'Fahrtenliste als PDF exportieren',
+              child: const Icon(Icons.picture_as_pdf, size: 28),
+            ),
+          ],
         ),
       ),
     );

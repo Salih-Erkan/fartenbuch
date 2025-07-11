@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter  
   flutter_colorpicker: ^1.1.0
   flutter_dotenv: ^5.2.1
   font_awesome_flutter: ^10.8.0
@@ -19,6 +21,8 @@ dependencies:
   google_places_flutter: ^2.0.5
   icons_launcher: ^3.0.1
   flutter_riverpod: ^2.6.1
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:

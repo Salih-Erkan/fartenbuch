@@ -12,7 +12,7 @@ import 'package:fartenbuch/src/features/farten/domain/adresse.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✔ RICHTIG!
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CreateFahrtScreen extends ConsumerStatefulWidget {
   const CreateFahrtScreen({super.key, required this.fahrtenanlassId});

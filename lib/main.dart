@@ -3,6 +3,7 @@ import 'package:fartenbuch/src/features/splash/splash_screen.dart';
 import 'package:fartenbuch/src/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,6 +28,15 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Fahrtenbuch',
       theme: AppTheme.theme,
+      supportedLocales: const [
+        Locale('de'), // Deutsch
+        Locale('en'), // Englisch
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const SplashScreen(),
     );
   }
